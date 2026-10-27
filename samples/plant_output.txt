@@ -1,0 +1,33 @@
+317 Modbus frames (159 requests) in samples/plant.pcap
+
+Function codes seen:
+     134  Read Holding Registers
+      15  Write Single Coil
+       4  Write Single Register
+       3  Read Coils
+       1  Encapsulated Interface (Device ID)
+       1  Schneider UMAS
+       1  Diagnostics
+
+Masters:
+  10.0.0.10           124 requests
+  10.0.0.99            32 requests  <- not on allow list
+  10.0.0.20             3 requests
+
+Findings: 8
+  [MEDIUM] 17:34:20.300  unknown_master
+      10.0.0.99 is talking Modbus to 10.0.0.50 and isn't on the allowed list.
+  [LOW] 17:34:20.300  device_fingerprint
+      10.0.0.99 asked 10.0.0.50 for its device ID (vendor, model, firmware). Common recon step.
+  [MEDIUM] 17:34:21.300  unit_id_sweep
+      10.0.0.99 has hit 5 different unit IDs. Looks like it's scanning for devices.
+  [MEDIUM] 17:34:21.504  exception_spike
+      5 exception responses to 10.0.0.99 (latest: Gateway Target Failed to Respond). Usually means someone is poking at addresses or codes the device doesn't support.
+  [MEDIUM] 17:34:23.100  unusual_function
+      Uncommon function code 90 (Schneider UMAS) from 10.0.0.99.
+  [HIGH] 17:34:23.200  unauthorized_write
+      15x Write Single Coil from unlisted host 10.0.0.99 to 10.0.0.50 (unit 1, addrs 0-14, last value ON).
+  [MEDIUM] 17:34:24.100  write_burst
+      10 writes from 10.0.0.99 in 5s.
+  [HIGH] 17:34:25.099  dangerous_diagnostic
+      Diagnostics subfunction 1 (Restart Communications Option) sent to 10.0.0.50. This can take the device off the network.
